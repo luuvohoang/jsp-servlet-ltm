@@ -1,0 +1,174 @@
+/**
+ * Image Upload Processing - CSS Styles
+ */
+
+/* Upload Area Styles */
+.preview-container {
+    width: 100%;
+    min-height: 200px;
+    border: 2px dashed #ccc;
+    border-radius: 5px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    margin-bottom: 15px;
+}
+
+.preview-container:hover {
+    border-color: #0d6efd;
+    background-color: rgba(13, 110, 253, 0.02);
+}
+
+.preview-container .upload-text {
+    color: #6c757d;
+    text-align: center;
+    padding: 20px;
+}
+
+.preview-container .upload-text i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #0d6efd;
+}
+
+.preview-container img {
+    max-width: 100%;
+    max-height: 300px;
+    display: none;
+    object-fit: contain;
+}
+
+/* Progress Bar */
+.progress-upload {
+    height: 10px;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    display: none;
+}
+
+.progress-upload .progress-bar {
+    background-color: #0d6efd;
+    transition: width 0.2s ease;
+}
+
+/* File Information */
+.file-info {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #6c757d;
+    display: none;
+    padding: 8px 12px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+}
+
+/* Processing Options */
+.processing-options {
+    margin-top: 30px;
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 5px;
+    border: 1px solid #e9ecef;
+}
+
+.processing-options h5 {
+    color: #495057;
+    margin-bottom: 15px;
+}
+
+/* Button Styles */
+.btn-primary {
+    padding: 10px 30px;
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+.btn-outline-secondary {
+    transition: all 0.3s ease;
+}
+
+/* Drag Effect */
+.dragover {
+    background-color: rgba(13, 110, 253, 0.05);
+    border-color: #0d6efd;
+    box-shadow: 0 0 10px rgba(13, 110, 253, 0.2);
+}
+
+/* Card styles */
+.card {
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+
+.card-header {
+    background-color: #0d6efd;
+    padding: 15px 20px;
+    border-bottom: none;
+}
+
+.card-header h3 {
+    margin: 0;
+    color: white;
+    font-weight: 500;
+}
+
+.card-body {
+    padding: 25px;
+}
+
+/* Form Elements */
+.form-label {
+    font-weight: 500;
+    color: #495057;
+}
+
+.form-select, .form-control {
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+    padding: 10px 15px;
+}
+
+.form-select:focus, .form-control:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.form-text {
+    color: #6c757d;
+    font-size: 0.875rem;
+    margin-top: 5px;
+}
+
+/* Custom Checkbox */
+.form-check-input:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 15px;
+    }
+    
+    .processing-options {
+        padding: 15px;
+    }
+    
+    .preview-container {
+        min-height: 150px;
+    }
+}
