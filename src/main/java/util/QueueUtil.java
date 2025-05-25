@@ -1,88 +1,132 @@
 package util;
 
 import model.ImageTask;
+import dao.ImageTaskDAO;
+import service.AIModeratorResponse;
+import service.AIModeratorService;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Date;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.PriorityBlockingQueue;
-import java.util.Comparator;
 
-/**
- * Utility class for managing the image processing queue
- */
 public class QueueUtil {
+    private static final BlockingQueue<ImageTask> moderationQueue = new LinkedBlockingQueue<>();
+    private final ImageTaskDAO imageTaskDAO;
+    private final AIModeratorService aiService;
+    private final String approvedPath;
     
-    // Queue for normal processing tasks
-    private static final BlockingQueue<ImageTask> taskQueue = new LinkedBlockingQueue<>();
+    public QueueUtil(String approvedPath) {
+        this.imageTaskDAO = new ImageTaskDAO();
+        this.aiService = new AIModeratorService(); // Giả sử có service này
+        this.approvedPath = approvedPath;
+        
+        // Tạo thư mục approved nếu chưa tồn tại
+        new File(approvedPath).mkdirs();
+        
+        // Khởi động worker thread để xử lý queue
+        startQueueProcessor();
+    }
     
-    // Priority queue for prioritized tasks (high, normal, low)
-    private static final BlockingQueue<ImageTask> priorityTaskQueue = new PriorityBlockingQueue<>(
-            100, Comparator.comparing(task -> {
+    private void startQueueProcessor() {
+        Thread worker = new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    ImageTask task = moderationQueue.take();
+                    processImageWithAI(task);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
+        });
+        worker.setDaemon(true);
+        worker.start();
+    }
 
-                        return 1;
-
-            }));
-    
-    // Flag to indicate which queue to use
-    private static final boolean USE_PRIORITY_QUEUE = true;
-    
-    /**
-     * Add a task to the processing queue
-     * @param task The task to add
-     */
     public void enqueue(ImageTask task) {
-        if (USE_PRIORITY_QUEUE) {
-            priorityTaskQueue.offer(task);
-        } else {
-            taskQueue.offer(task);
+        if (task == null) {
+            throw new IllegalArgumentException("Task cannot be null");
         }
-        System.out.println("Task added to queue: " + task.getId());
+        moderationQueue.offer(task);
     }
     
-    /**
-     * Take the next task from the queue (blocking operation)
-     * @return The next task to process
-     * @throws InterruptedException if interrupted while waiting
-     */
-    public ImageTask dequeue() throws InterruptedException {
-        if (USE_PRIORITY_QUEUE) {
-            return priorityTaskQueue.take();
-        } else {
-            return taskQueue.take();
+    private void processImageWithAI(ImageTask task) {
+        try {
+            task.setStatus("PROCESSING");
+            imageTaskDAO.update(task);
+
+            // Gọi AI service
+            AIModeratorResponse result = aiService.moderateImage(task.getImagePath());
+        
+            // Xử lý kết quả
+            if (result.isApproved()) {
+                System.out.println("oke");
+                // Sửa: Chuyển imagePath thành Path object
+                Path originalPath = Paths.get(task.getImagePath());
+                handleApprovedImage(task, originalPath);
+            } else {
+                System.out.println("not oke");
+                // Sửa: Chuyển imagePath thành Path object và thêm reason
+                Path imagePath = Paths.get(task.getImagePath());
+                handleRejectedImage(task, imagePath, result.getReason());
+            }
+        
+            // Cập nhật confidence score
+            task.setCustomParams("confidence=" + result.getConfidence());
+            imageTaskDAO.update(task);
+
+        } catch (Exception e) {
+            handleProcessingError(task, e);
         }
     }
     
-    /**
-     * Get the current size of the queue
-     * @return The number of tasks in the queue
-     */
+    // Signature đã được sửa để khớp với cách gọi
+    private void handleApprovedImage(ImageTask task, Path originalPath) throws IOException {
+        // Tạo đường dẫn mới trong thư mục approved
+        String filename = originalPath.getFileName().toString();
+        Path approvedImagePath = Paths.get(approvedPath, filename);
+        
+        // Di chuyển file vào thư mục approved
+        Files.move(originalPath, approvedImagePath);
+        
+        // Cập nhật task
+        task.setStatus("COMPLETED");
+        task.setResultPath(approvedImagePath.toString());
+        imageTaskDAO.update(task);
+    }
+    
+    // Signature đã được sửa để khớp với cách gọi
+    private void handleRejectedImage(ImageTask task, Path imagePath, String reason) {
+        try {
+            // Xóa file vi phạm
+            Files.deleteIfExists(imagePath);
+            
+            // Cập nhật task
+            task.setStatus("FAILED");
+            task.setErrorMessage(reason);
+            imageTaskDAO.update(task);
+        } catch (IOException e) {
+            handleProcessingError(task, e);
+        }
+    }
+    
+    private void handleProcessingError(ImageTask task, Exception e) {
+        task.setStatus("FAILED");
+        task.setErrorMessage(e.getMessage());
+        imageTaskDAO.update(task);
+    }
+    
     public int getQueueSize() {
-        if (USE_PRIORITY_QUEUE) {
-            return priorityTaskQueue.size();
-        } else {
-            return taskQueue.size();
-        }
+        return moderationQueue.size();
     }
     
-    /**
-     * Check if the queue is empty
-     * @return true if the queue is empty, false otherwise
-     */
     public boolean isQueueEmpty() {
-        if (USE_PRIORITY_QUEUE) {
-            return priorityTaskQueue.isEmpty();
-        } else {
-            return taskQueue.isEmpty();
-        }
-    }
-    
-    /**
-     * Clear all tasks from the queue
-     */
-    public void clearQueue() {
-        if (USE_PRIORITY_QUEUE) {
-            priorityTaskQueue.clear();
-        } else {
-            taskQueue.clear();
-        }
+        return moderationQueue.isEmpty();
     }
 }

@@ -48,9 +48,6 @@ public class ImageProcessor {
             // Process the image based on the processing type
             BufferedImage outputImage = null;
 
-            
-
-            
             if (outputImage == null) {
                 throw new IOException("Failed to process image");
             }
