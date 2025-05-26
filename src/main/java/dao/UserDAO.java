@@ -16,7 +16,7 @@ public class UserDAO {
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getEmail());
-            ps.setString(3, user.getPassword()); // Trong thực tế nên mã hóa password
+            ps.setString(3, user.getPassword());
             ps.executeUpdate();
         }
     }

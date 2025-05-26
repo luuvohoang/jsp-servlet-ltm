@@ -25,7 +25,6 @@ public class ResultsServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Kiểm tra đăng nhập
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
 
@@ -34,7 +33,6 @@ public class ResultsServlet extends HttpServlet {
             return;
         }
 
-        // Lấy tham số phân trang
         int page = 1;
         int pageSize = 10;
         String sortBy = "submitTime";
@@ -63,15 +61,12 @@ public class ResultsServlet extends HttpServlet {
                 filter = filterParam;
             }
         } catch (NumberFormatException e) {
-            // Sử dụng giá trị mặc định
         }
 
-        // Lấy danh sách ảnh đã xử lý
         List<ImageTask> imageTasks = imageTaskDAO.getImageTasksByUserId(user.getId(), filter, sortBy, sortOrder, page, pageSize);
         int totalTasks = imageTaskDAO.countImageTasksByUserId(user.getId(), filter);
         int totalPages = (int) Math.ceil((double) totalTasks / pageSize);
 
-        // Thiết lập thuộc tính cho view
         request.setAttribute("imageTasks", imageTasks);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
@@ -80,7 +75,6 @@ public class ResultsServlet extends HttpServlet {
         request.setAttribute("filter", filter);
         request.setAttribute("totalTasks", totalTasks);
 
-        // Chuyển tới trang kết quả
         request.getRequestDispatcher("/WEB-INF/views/image/results.jsp").forward(request, response);
     }
 }

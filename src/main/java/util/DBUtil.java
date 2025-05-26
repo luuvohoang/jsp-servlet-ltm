@@ -23,11 +23,7 @@ public class DBUtil {
             e.printStackTrace();
         }
     }
-    
-    /**
-     * Get a connection to the database
-     * @return Connection object
-     */
+
     public static Connection getConnection() {
         if (connection != null) {
             try {
@@ -48,20 +44,5 @@ public class DBUtil {
         }
         
         return connection;
-    }
-    
-    /**
-     * Close the database connection
-     */
-    public static void closeConnection() {
-        try {
-            if (connection != null && !connection.isClosed()) {
-                connection.close();
-                System.out.println("Database connection closed");
-            }
-        } catch (SQLException e) {
-            System.out.println("Error closing database connection: " + e.getMessage());
-            e.printStackTrace();
-        }
     }
 }

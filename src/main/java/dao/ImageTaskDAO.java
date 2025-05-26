@@ -6,21 +6,9 @@ import util.DBUtil;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-
 import static util.DBUtil.connection;
 
-/**
- * DAO implementation for ImageTask entity
- * Handles database operations for the image processing tasks
- */
 public class ImageTaskDAO implements TaskDAO<ImageTask> {
-
-    /**
-     * Lưu một image task mới vào database
-     *
-     * @param task - ImageTask cần lưu
-     * @return ImageTask với ID đã được thiết lập nếu thành công, null nếu thất bại
-     */
     @Override
     public ImageTask save(ImageTask task) {
         String sql = "INSERT INTO image_tasks (user_id, image_path, original_filename, " +
@@ -56,13 +44,6 @@ public class ImageTaskDAO implements TaskDAO<ImageTask> {
             return null;
         }
     }
-
-    /**
-     * Cập nhật thông tin của một image task
-     *
-     * @param task - ImageTask cần cập nhật
-     * @return ImageTask đã cập nhật nếu thành công, null nếu thất bại
-     */
     @Override
     public ImageTask update(ImageTask task) {
         String sql = "UPDATE image_tasks SET image_path = ?, result_path = ?, status = ?, " +
@@ -92,12 +73,6 @@ public class ImageTaskDAO implements TaskDAO<ImageTask> {
         }
     }
 
-    /**
-     * Lấy một image task theo ID
-     *
-     * @param id - ID của image task cần lấy
-     * @return ImageTask hoặc null nếu không tìm thấy
-     */
     @Override
     public ImageTask findById(Long id) {
         String sql = "SELECT * FROM image_tasks WHERE id = ?";
@@ -118,12 +93,7 @@ public class ImageTaskDAO implements TaskDAO<ImageTask> {
     
         return null;
     }
-    
-    /**
-     * Lấy tất cả image tasks
-     *
-     * @return Danh sách tất cả ImageTask
-     */
+
     @Override
     public List<ImageTask> findAll() {
         List<ImageTask> tasks = new ArrayList<>();
@@ -143,12 +113,6 @@ public class ImageTaskDAO implements TaskDAO<ImageTask> {
         return tasks;
     }
 
-    /**
-     * Tìm các task theo user ID
-     * 
-     * @param userId ID của user
-     * @return Danh sách các task thuộc về user
-     */
     public List<ImageTask> findByUserId(Long userId) {
         List<ImageTask> tasks = new ArrayList<>();
         String sql = "SELECT * FROM image_tasks WHERE user_id = ? ORDER BY submit_time DESC";
@@ -169,13 +133,7 @@ public class ImageTaskDAO implements TaskDAO<ImageTask> {
     
         return tasks;
     }
-    
-    /**
-     * Tìm các task theo trạng thái
-     * 
-     * @param status Trạng thái task (PENDING, PROCESSING, COMPLETED, FAILED)
-     * @return Danh sách các task có trạng thái được chỉ định
-     */
+
     public List<ImageTask> findByStatus(String status) {
         List<ImageTask> tasks = new ArrayList<>();
         String sql = "SELECT * FROM image_tasks WHERE status = ? ORDER BY submit_time ASC";
@@ -196,18 +154,7 @@ public class ImageTaskDAO implements TaskDAO<ImageTask> {
     
         return tasks;
     }
-    
-    /**
-     * Lấy danh sách image tasks của một user với phân trang và lọc
-     *
-     * @param userId - ID của user
-     * @param filter - Lọc theo trạng thái (all, completed, processing, failed)
-     * @param sortBy - Sắp xếp theo trường nào (submitTime, status)
-     * @param sortOrder - Thứ tự sắp xếp (asc, desc)
-     * @param page - Trang hiện tại
-     * @param pageSize - Số lượng kết quả trên mỗi trang
-     * @return Danh sách ImageTask
-     */
+
     public List<ImageTask> getImageTasksByUserId(long userId, String filter, String sortBy,
                                                  String sortOrder, int page, int pageSize) {
         List<ImageTask> result = new ArrayList<>();
@@ -225,7 +172,6 @@ public class ImageTaskDAO implements TaskDAO<ImageTask> {
             }
         }
 
-        // Thêm sắp xếp
         sqlBuilder.append(" ORDER BY ");
         if ("status".equals(sortBy)) {
             sqlBuilder.append("status");
@@ -239,7 +185,6 @@ public class ImageTaskDAO implements TaskDAO<ImageTask> {
             sqlBuilder.append(" DESC");
         }
 
-        // Thêm phân trang
         int offset = (page - 1) * pageSize;
         sqlBuilder.append(" LIMIT ").append(pageSize).append(" OFFSET ").append(offset);
 
@@ -286,7 +231,6 @@ public class ImageTaskDAO implements TaskDAO<ImageTask> {
     public int countImageTasksByUserId(long userId, String filter) {
         StringBuilder sqlBuilder = new StringBuilder("SELECT COUNT(*) FROM image_tasks WHERE user_id = ?");
 
-        // Thêm điều kiện lọc
         if (!"all".equals(filter)) {
             if ("completed".equals(filter)) {
                 sqlBuilder.append(" AND status = 'COMPLETED'");
@@ -314,11 +258,6 @@ public class ImageTaskDAO implements TaskDAO<ImageTask> {
         return 0;
     }
 
-    /**
-     * Lấy danh sách các tasks đang chờ xử lý
-     *
-     * @return Danh sách ImageTask
-     */
     public List<ImageTask> getPendingTasks() {
         List<ImageTask> result = new ArrayList<>();
         String sql = "SELECT * FROM image_tasks WHERE status = 'PENDING' ORDER BY submit_time ASC";
@@ -336,12 +275,6 @@ public class ImageTaskDAO implements TaskDAO<ImageTask> {
         return result;
     }
 
-    /**
-     * Xóa một image task từ database
-     *
-     * @param id - ID của task cần xóa
-     * @return true nếu xóa thành công, false nếu thất bại
-     */
     @Override
     public boolean delete(Long id) {
         String sql = "DELETE FROM image_tasks WHERE id = ?";
@@ -358,14 +291,7 @@ public class ImageTaskDAO implements TaskDAO<ImageTask> {
             return false;
         }
     }
-    
-    /**
-     * Map dữ liệu từ ResultSet sang đối tượng ImageTask
-     *
-     * @param rs - ResultSet chứa dữ liệu
-     * @return Đối tượng ImageTask
-     * @throws SQLException
-     */
+
     private ImageTask mapResultSetToImageTask(ResultSet rs) throws SQLException {
         ImageTask task = new ImageTask();
 
@@ -384,34 +310,4 @@ public class ImageTaskDAO implements TaskDAO<ImageTask> {
 
         return task;
     }
-        
-            /**
-             * Khởi tạo bảng database nếu chưa tồn tại
-             */
-            public void initDatabase() {
-        String createTableSQL =
-                "CREATE TABLE IF NOT EXISTS image_tasks (" +
-                        "id BIGINT AUTO_INCREMENT PRIMARY KEY," +
-                        "user_id BIGINT NOT NULL," +
-                        "image_path VARCHAR(255) NOT NULL," +
-                        "original_filename VARCHAR(255)," +
-                        "description TEXT," +
-                        "custom_params TEXT," +
-                        "notify_when_complete BOOLEAN DEFAULT FALSE," +
-                        "status VARCHAR(20) NOT NULL," +
-                        "submit_time TIMESTAMP NOT NULL," +
-                        "processing_time TIMESTAMP," +
-                        "result_path VARCHAR(255)," +
-                        "error_message TEXT," +
-                        "INDEX (user_id)," +
-                        "INDEX (status)" +
-                        ")";
-        
-        try (Connection conn = DBUtil.getConnection();
-             Statement stmt = conn.createStatement()) {
-            stmt.execute(createTableSQL);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-            }
 }

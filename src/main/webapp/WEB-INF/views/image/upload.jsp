@@ -147,7 +147,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         $(document).ready(function() {
-            // Process type change
             $('#processingType').change(function() {
                 if ($(this).val() === 'custom') {
                     $('#customParamsContainer').show();
@@ -155,8 +154,7 @@
                     $('#customParamsContainer').hide();
                 }
             });
-            
-            // Preview image functionality
+
             const dropArea = document.getElementById('dropArea');
             const imageInput = document.getElementById('imageInput');
             const imagePreview = document.getElementById('imagePreview');
@@ -166,13 +164,11 @@
             const removeFile = document.getElementById('removeFile');
             const uploadProgress = document.getElementById('uploadProgress');
             const uploadText = document.querySelector('.upload-text');
-            
-            // Click to browse
+
             dropArea.addEventListener('click', function() {
                 imageInput.click();
             });
-            
-            // Handle drag and drop
+
             ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
                 dropArea.addEventListener(eventName, preventDefaults, false);
             });
@@ -197,8 +193,7 @@
             function unhighlight() {
                 dropArea.classList.remove('dragover');
             }
-            
-            // Handle file drop
+
             dropArea.addEventListener('drop', handleDrop, false);
             
             function handleDrop(e) {
@@ -209,8 +204,6 @@
                     handleFiles(files);
                 }
             }
-            
-            // Handle file selection
             imageInput.addEventListener('change', function() {
                 handleFiles(this.files);
             });
@@ -218,19 +211,15 @@
             function handleFiles(files) {
                 if (files.length > 0) {
                     const file = files[0];
-                    
-                    // Check if file is an image
+
                     if (!file.type.match('image.*')) {
                         alert('Please select an image file (JPEG, PNG, GIF, etc.)');
                         return;
                     }
-                    
-                    // Display file info
                     fileName.textContent = file.name;
                     fileSize.textContent = formatFileSize(file.size);
                     fileInfo.style.display = 'block';
-                    
-                    // Show preview
+
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         imagePreview.src = e.target.result;
@@ -238,13 +227,10 @@
                         uploadText.style.display = 'none';
                     };
                     reader.readAsDataURL(file);
-                    
-                    // Show progress (simulated)
+
                     uploadProgress.style.display = 'flex';
                     const progressBar = uploadProgress.querySelector('.progress-bar');
                     progressBar.style.width = '0%';
-                    
-                    // Simulate progress
                     let width = 0;
                     const interval = setInterval(() => {
                         width += 5;
@@ -258,8 +244,7 @@
                     }, 50);
                 }
             }
-            
-            // Remove file
+
             removeFile.addEventListener('click', function() {
                 imageInput.value = '';
                 imagePreview.src = '';
@@ -268,8 +253,7 @@
                 uploadText.style.display = 'block';
                 uploadProgress.style.display = 'none';
             });
-            
-            // Format file size
+
             function formatFileSize(bytes) {
                 if (bytes === 0) return '0 Bytes';
                 
@@ -279,16 +263,14 @@
                 
                 return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
             }
-            
-            // Form submission
+
             $('#uploadForm').submit(function(e) {
                 if (!imageInput.files.length) {
                     e.preventDefault();
                     alert('Please select an image to upload');
                     return false;
                 }
-                
-                // Show processing message
+
                 $('#submitBtn').prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...');
                 
                 return true;

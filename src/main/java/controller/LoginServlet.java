@@ -31,23 +31,6 @@ public class LoginServlet extends HttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         
-        // Kiểm tra mặc định username=1 và password=1
-        if ("1".equals(username) && "1".equals(password)) {
-            // Tạo user mặc định để đăng nhập nhanh
-            User defaultUser = new User();
-            defaultUser.setId(999);
-            defaultUser.setUsername("admin");
-            defaultUser.setEmail("admin@example.com");
-            
-            // Lưu user vào session
-            HttpSession session = request.getSession();
-            session.setAttribute("user", defaultUser);
-            
-            // Chuyển hướng đến trang home
-            response.sendRedirect(request.getContextPath() + "/upload");
-            return;
-        }
-        
         try {
             User user = userDAO.login(username, password);
             if (user != null) {

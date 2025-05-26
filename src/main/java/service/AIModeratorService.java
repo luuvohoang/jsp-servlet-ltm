@@ -13,28 +13,22 @@ public class AIModeratorService {
 
     public AIModeratorResponse moderateImage(String imagePath) throws IOException {
         try {
-            // Đọc file ảnh và chuyển thành base64
             byte[] imageBytes = Files.readAllBytes(Path.of(imagePath));
             String base64Image = Base64.getEncoder().encodeToString(imageBytes);
-
-            // Tạo JSON request
             JSONObject jsonRequest = new JSONObject();
             jsonRequest.put("image", base64Image);
 
-            // Thiết lập connection
             URL url = new URL(API_URL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setDoOutput(true);
 
-            // Gửi request
             try (OutputStream os = conn.getOutputStream()) {
                 byte[] input = jsonRequest.toString().getBytes("utf-8");
                 os.write(input, 0, input.length);
             }
 
-            // Đọc response
             try (BufferedReader br = new BufferedReader(
                     new InputStreamReader(conn.getInputStream(), "utf-8"))) {
                 StringBuilder response = new StringBuilder();
@@ -43,7 +37,6 @@ public class AIModeratorService {
                     response.append(responseLine.trim());
                 }
 
-                // Parse response
                 JSONObject jsonResponse = new JSONObject(response.toString());
                 return parseResponse(jsonResponse);
             }
@@ -54,13 +47,10 @@ public class AIModeratorService {
     }
 
     private AIModeratorResponse parseResponse(JSONObject jsonResponse) {
-        // Log response để debug
         System.out.println("AI Response: " + jsonResponse.toString());
         
         try {
             AIModeratorResponse response = new AIModeratorResponse();
-
-            // Giả sử API trả về các trường prediction và confidence
             response.setApproved(jsonResponse.getBoolean("is_approved"));
             response.setConfidence(jsonResponse.getDouble("confidence"));
 
