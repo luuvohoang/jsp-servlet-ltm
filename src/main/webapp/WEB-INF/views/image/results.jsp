@@ -172,7 +172,7 @@
                                 <div class="card-image">
                                     <c:choose>
                                         <c:when test="${not empty task.resultPath}">
-                                            <img src="${pageContext.request.contextPath}/uploads/${task.resultPath}"
+                                            <img src="${pageContext.request.contextPath}/uploads/${task.originalFilename}"
                                                  alt="Image result" class="img-fluid">
                                         </c:when>
                                         <c:otherwise>

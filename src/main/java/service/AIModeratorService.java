@@ -64,7 +64,7 @@ public class AIModeratorService {
             response.setApproved(jsonResponse.getBoolean("is_approved"));
             response.setConfidence(jsonResponse.getDouble("confidence"));
 
-            if (!response.isApproved()) {
+            if (response.isApproved()) {
                 response.setReason(jsonResponse.optString("reason", "Content violated guidelines"));
             }
 

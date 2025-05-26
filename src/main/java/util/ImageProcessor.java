@@ -71,6 +71,7 @@ public class ImageProcessor {
             return true;
         } catch (Exception e) {
             // Update task status to FAILED
+            System.out.println("Failed to process task: ");
             task.setStatus("FAILED");
             task.setErrorMessage(e.getMessage());
             imageTaskDAO.update(task);

@@ -32,7 +32,7 @@ public class UploadServlet extends HttpServlet {
     private String uploadPath;
     
     public void init() {
-        String approvedPath = getServletContext().getRealPath("") + File.separator + "approved";
+        String approvedPath = getServletContext().getRealPath("") + File.separator + "uploads";
         imageTaskDAO = new ImageTaskDAO();
         queueUtil = new QueueUtil(approvedPath);
         
