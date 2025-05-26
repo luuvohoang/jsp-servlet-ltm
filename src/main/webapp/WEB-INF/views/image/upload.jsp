@@ -53,17 +53,8 @@
             display: none;
         }
         
-        .processing-options {
-            margin-top: 20px;
-        }
-        
         .btn-primary {
             padding: 10px 30px;
-        }
-        
-        .dragover {
-            background-color: rgba(13, 110, 253, 0.05);
-            border-color: #0d6efd;
         }
     </style>
 </head>
@@ -71,7 +62,7 @@
 <%--    <jsp:include page="/WEB-INF/layouts/header.jsp" />--%>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand" href="${pageContext.request.contextPath}/home">Image Processing App</a>
+            <a class="navbar-brand" href="${pageContext.request.contextPath}/results">Scam App</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -136,13 +127,6 @@
                                     <label for="description" class="form-label">Description (Optional)</label>
                                     <textarea class="form-control" id="description" name="description" rows="2" 
                                               placeholder="Enter a description of this processing task"></textarea>
-                                </div>
-                                
-                                <div class="form-check mb-3">
-                                    <input class="form-check-input" type="checkbox" id="notifyWhenComplete" name="notifyWhenComplete" value="true">
-                                    <label class="form-check-label" for="notifyWhenComplete">
-                                        Notify me when processing is complete
-                                    </label>
                                 </div>
                             </div>
                             

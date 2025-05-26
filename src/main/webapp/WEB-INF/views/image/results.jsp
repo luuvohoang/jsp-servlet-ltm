@@ -38,16 +38,7 @@
             top: 10px;
             right: 10px;
         }
-        
-        .btn-icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
+
         
         .img-placeholder {
             width: 100%;
@@ -78,7 +69,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand" href="${pageContext.request.contextPath}/home">Image Processing App</a>
+            <a class="navbar-brand" href="${pageContext.request.contextPath}/results">Scam App</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -181,12 +172,14 @@
                                 <div class="card-image">
                                     <c:choose>
                                         <c:when test="${not empty task.resultPath}">
-                                            <img src="${pageContext.request.contextPath}/images/${task.resultPath}" 
+                                            <img src="${pageContext.request.contextPath}/uploads/${task.resultPath}"
                                                  alt="Image result" class="img-fluid">
                                         </c:when>
                                         <c:otherwise>
                                             <div class="img-placeholder">
-                                                <i class="fas fa-image"></i>
+<%--                                                <i class="fas fa-image"></i>--%>
+                                                <img src="${pageContext.request.contextPath}/uploads/${task.originalFilename}"
+                                                     alt="Image result" class="img-fluid">
                                             </div>
                                         </c:otherwise>
                                     </c:choose>
@@ -220,17 +213,12 @@
                                 </div>
                                 <div class="card-footer bg-transparent">
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <div class="btn-group">
-                                            <a href="${pageContext.request.contextPath}/image/view?id=${task.id}" class="btn btn-sm btn-outline-primary">
-                                                <i class="fas fa-eye me-1"></i>View
-                                            </a>
-                                            <c:if test="${task.status eq 'COMPLETED'}">
-                                                <a href="${pageContext.request.contextPath}/image/download?id=${task.id}" class="btn btn-sm btn-outline-success">
-                                                    <i class="fas fa-download me-1"></i>Download
-                                                </a>
-                                            </c:if>
-                                        </div>
-                                        <small class="text-muted">#${task.id}</small>
+<%--                                        <div class="btn-group">--%>
+<%--                                            <c:if test="${task.status eq 'COMPLETED'}">--%>
+<%--                                                <small class="text-muted">#${task.id}</small>--%>
+<%--                                            </c:if>--%>
+<%--                                        </div>--%>
+<%--                                        <small class="text-muted">#${task.id}</small>--%>
                                     </div>
                                 </div>
                             </div>
@@ -279,7 +267,7 @@
     
     <footer class="bg-light py-4 mt-5">
         <div class="container text-center">
-            <p class="text-muted mb-0">© 2023 Image Processing App</p>
+            <p class="text-muted mb-0">© 2025 Scam </p>
         </div>
     </footer>
     

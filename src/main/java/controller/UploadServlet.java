@@ -94,10 +94,9 @@ public class UploadServlet extends HttpServlet {
             boolean notifyWhenComplete = "on".equals(request.getParameter("notify"));
 
             // Generate unique filename
+            // Use original filename
             String originalFilename = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-            String fileExtension = originalFilename.substring(originalFilename.lastIndexOf('.'));
-            String uniqueFilename = UUID.randomUUID().toString() + fileExtension;
-            String filePath = uploadPath + File.separator + uniqueFilename;
+            String filePath = uploadPath + File.separator + originalFilename;
 
             // Save the file
             filePart.write(filePath);

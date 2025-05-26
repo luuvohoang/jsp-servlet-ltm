@@ -14,9 +14,14 @@ import java.util.Date;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class QueueUtil {
     private static final BlockingQueue<ImageTask> moderationQueue = new LinkedBlockingQueue<>();
+    private static final int THREAD_POOL_SIZE = 5;
+    private final ExecutorService executorService;
     private final ImageTaskDAO imageTaskDAO;
     private final AIModeratorService aiService;
     private final String approvedPath;
@@ -30,23 +35,31 @@ public class QueueUtil {
         new File(approvedPath).mkdirs();
         
         // Khởi động worker thread để xử lý queue
+        executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
         startQueueProcessor();
     }
     
     private void startQueueProcessor() {
-        Thread worker = new Thread(() -> {
-            while (!Thread.currentThread().isInterrupted()) {
-                try {
-                    ImageTask task = moderationQueue.take();
-                    processImageWithAI(task);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    break;
+        // Xử lý queue với multiple threads
+        for (int i = 0; i < THREAD_POOL_SIZE; i++) {
+            Thread worker = new Thread(() -> {
+                while (!Thread.currentThread().isInterrupted()) {
+                    try {
+                        ImageTask task = moderationQueue.poll(1, TimeUnit.SECONDS);
+                        if (task != null) {
+                            CompletableFuture.runAsync(() -> {
+                                processImageWithAI(task);
+                            }, executorService);
+                        }
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
                 }
-            }
-        });
-        worker.setDaemon(true);
-        worker.start();
+            });
+            worker.setDaemon(true);
+            worker.start();
+        }
     }
 
     public void enqueue(ImageTask task) {
