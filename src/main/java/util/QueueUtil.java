@@ -28,7 +28,7 @@ public class QueueUtil {
     
     public QueueUtil(String approvedPath) {
         this.imageTaskDAO = new ImageTaskDAO();
-        this.aiService = new AIModeratorService(); // Giả sử có service này
+        this.aiService = new AIModeratorService();
         this.approvedPath = approvedPath;
 
         new File(approvedPath).mkdirs();
@@ -74,8 +74,8 @@ public class QueueUtil {
             imageTaskDAO.update(task);
 
             AIModeratorResponse result = aiService.moderateImage(task.getImagePath());
-
-            if (result.isApproved()) {
+            // false -> none -> ảnh được
+            if (!result.isApproved()) {
                 System.out.println("oke");
                 Path originalPath = Paths.get(task.getImagePath());
                 handleApprovedImage(task, originalPath);

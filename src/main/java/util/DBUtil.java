@@ -4,9 +4,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-/**
- * Database utility class for managing connections
- */
 public class DBUtil {
     
     private static final String JDBC_URL = "jdbc:mysql://localhost:3306/dulieu";
