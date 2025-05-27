@@ -98,7 +98,6 @@ public class QueueUtil {
         }
     }
 
-    // Signature đã được sửa để khớp với cách gọi
     private void handleApprovedImage(ImageTask task, Path originalPath) throws IOException {
         if (!Files.exists(originalPath)) {
             throw new IOException("Original file not found: " + Paths.get(task.getOriginalFilename()));
@@ -117,7 +116,6 @@ public class QueueUtil {
         imageTaskDAO.update(task);
     }
 
-    // Signature đã được sửa để khớp với cách gọi
     private void handleRejectedImage(ImageTask task, Path imagePath, String reason) {
         try {
             // Xóa file vi phạm

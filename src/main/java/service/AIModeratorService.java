@@ -43,7 +43,6 @@ public class AIModeratorService {
                     response.append(responseLine.trim());
                 }
 
-                // Parse response
                 JSONObject jsonResponse = new JSONObject(response.toString());
                 return parseResponse(jsonResponse);
             }
@@ -54,13 +53,11 @@ public class AIModeratorService {
     }
 
     private AIModeratorResponse parseResponse(JSONObject jsonResponse) {
-        // Log response để debug
         System.out.println("AI Response: " + jsonResponse.toString());
 
         try {
             AIModeratorResponse response = new AIModeratorResponse();
 
-            // Giả sử API trả về các trường prediction và confidence
             response.setApproved(jsonResponse.getBoolean("is_approved"));
             response.setConfidence(jsonResponse.getDouble("confidence"));
 
