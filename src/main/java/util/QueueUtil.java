@@ -25,19 +25,20 @@ public class QueueUtil {
     private final ImageTaskDAO imageTaskDAO;
     private final AIModeratorService aiService;
     private final String approvedPath;
-    
+
     public QueueUtil(String approvedPath) {
         this.imageTaskDAO = new ImageTaskDAO();
-        this.aiService = new AIModeratorService();
+        this.aiService = new AIModeratorService(); // Giả sử có service này
         this.approvedPath = approvedPath;
 
+        // Tạo thư mục approved nếu chưa tồn tại
         new File(approvedPath).mkdirs();
-        
+
         // Khởi động worker thread để xử lý queue
         executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
         startQueueProcessor();
     }
-    
+
     private void startQueueProcessor() {
         // Xử lý queue với multiple threads
         for (int i = 0; i < THREAD_POOL_SIZE; i++) {
@@ -67,16 +68,19 @@ public class QueueUtil {
         }
         moderationQueue.offer(task);
     }
-    
+
     private void processImageWithAI(ImageTask task) {
         try {
             task.setStatus("PROCESSING");
             imageTaskDAO.update(task);
 
+            // Gọi AI service
             AIModeratorResponse result = aiService.moderateImage(task.getImagePath());
-            // false -> none -> ảnh được
+
+            // Xử lý kết quả
             if (!result.isApproved()) {
                 System.out.println("oke");
+                // Sửa: Lấy đường dẫn đầy đủ từ imagePath thay vì chỉ lấy filename
                 Path originalPath = Paths.get(task.getImagePath());
                 handleApprovedImage(task, originalPath);
             } else {
@@ -85,6 +89,7 @@ public class QueueUtil {
                 handleRejectedImage(task, imagePath, result.getReason());
             }
 
+            // Cập nhật confidence score
             task.setCustomParams("confidence=" + result.getConfidence());
             imageTaskDAO.update(task);
 
@@ -93,32 +98,56 @@ public class QueueUtil {
         }
     }
 
+    // Signature đã được sửa để khớp với cách gọi
     private void handleApprovedImage(ImageTask task, Path originalPath) throws IOException {
+        if (!Files.exists(originalPath)) {
+            throw new IOException("Original file not found: " + Paths.get(task.getOriginalFilename()));
+        }
+
         String filename = originalPath.getFileName().toString();
         Path approvedImagePath = Paths.get(approvedPath, filename);
 
-        Files.move(originalPath, approvedImagePath);
+        Files.createDirectories(Paths.get(approvedPath));
+
+        Files.move(originalPath, approvedImagePath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        System.out.println("File moved successfully to: " + approvedImagePath);
 
         task.setStatus("COMPLETED");
         task.setResultPath(approvedImagePath.toString());
         imageTaskDAO.update(task);
     }
 
+    // Signature đã được sửa để khớp với cách gọi
     private void handleRejectedImage(ImageTask task, Path imagePath, String reason) {
         try {
-            Files.deleteIfExists(imagePath);
+            // Xóa file vi phạm
+//            Files.deleteIfExists(imagePath);
 
+            // Cập nhật task
             task.setStatus("FAILED");
             task.setErrorMessage(reason);
             imageTaskDAO.update(task);
-        } catch (IOException e) {
+        } catch (Exception e) {
             handleProcessingError(task, e);
         }
     }
-    
+
     private void handleProcessingError(ImageTask task, Exception e) {
+        System.out.println("Error processing task: " + task.getId());
+        System.out.println("Error message: " + e.getMessage());
+        System.out.println("Error details:");
+        e.printStackTrace();
+
         task.setStatus("FAILED");
         task.setErrorMessage(e.getMessage());
         imageTaskDAO.update(task);
+    }
+
+    public int getQueueSize() {
+        return moderationQueue.size();
+    }
+
+    public boolean isQueueEmpty() {
+        return moderationQueue.isEmpty();
     }
 }
